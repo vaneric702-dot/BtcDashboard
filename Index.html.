@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Financial Dashboard - Pending Transaction</title>
+    <!-- Google Fonts for professional typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: #0b0f19;
+            color: #f3f4f6;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Sidebar Navigation */
+        .sidebar {
+            width: 260px;
+            background-color: #111827;
+            border-right: 1px solid #1f2937;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 24px;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 40px;
+        }
+
+        .logo-area i {
+            color: #6366f1;
+            font-size: 1.5rem;
+        }
+
+        .nav-links {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            flex-grow: 1;
+        }
+
+        .nav-links li a {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            color: #9ca3af;
+            text-decoration: none;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .nav-links li.active a, .nav-links li a:hover {
+            background-color: #1f2937;
+            color: #ffffff;
+        }
+
+        .nav-links li.active a i {
+            color: #6366f1;
+        }
+
+        .sidebar-footer {
+            border-top: 1px solid #1f2937;
+            padding-top: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #374151;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .user-info .name {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .user-info .role {
+            font-size: 0.75rem;
+            color: #9ca3af;
+        }
+
+        /* Main Content Area */
+        .main-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        /* Top Header */
+        header {
+            background-color: #111827;
+            border-bottom: 1px solid #1f2937;
+            padding: 20px 32px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #ffffff;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .notification-btn {
+            background: none;
+            border: none;
+            color: #9ca3af;
+            font-size: 1.2rem;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .notification-btn::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 8px;
+            height: 8px;
+            background-color: #ef4444;
+            border-radius: 50%;
+        }
+
+        /* Dashboard Body */
+        .dashboard-body {
+            padding: 32px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* Stats Cards Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+        }
+
+        .stat-card {
+            background-color: #111827;
+            border: 1px solid #1f2937;
+            border-radius: 12px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .stat-card .title {
+            font-size: 0.875rem;
+            color: #9ca3af;
+            font-weight: 500;
+        }
+
+        .stat-card .value {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        .stat-card .trend {
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .trend.positive { color: #10b981; }
+        .trend.warning { color: #f59e0b; }
+
+        /* Main Transaction Card */
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 16px;
+        }
+
+        .transaction-card {
+            background-color: #111827;
+            border: 1px solid #1f2937;
+            border-radius: 12px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .tx-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #1f2937;
+            padding-bottom: 16px;
+        }
+
+        .tx-id {
+            font-family: monospace;
+            color: #9ca3af;
+            font-size: 0.9rem;
+        }
+
+        .badge-pending {
+            background-color: rgba(245, 158, 11, 0.1);
+            color: #f59e0b;
+            border: 1px solid rgba(245, 158, 11, 0.2);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .tx-details-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .detail-item label {
+            display: block;
+            font-size: 0.75rem;
+            color: #9ca3af;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 6px;
+        }
+
+        .detail-item .detail-value {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #ffffff;
+        }
+
+        .detail-item .detail-value.amount {
+            font-size: 1.5rem;
+            color: #10b981;
+        }
+
+        .tx-footer {
+            background-color: #1f2937;
+            padding: 14px 20px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.875rem;
+        }
+
+        .tx-footer span {
+            color: #d1d5db;
+        }
+
+        .tx-footer strong {
+            color: #f59e0b;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div>
+            <div class="logo-area">
+                <i class="fa-solid fa-shield-halved"></i>
+                <span>ApexPay</span>
+            </div>
+            <ul class="nav-links">
+                <li class="active">
+                    <a href="#"><i class="fa-solid fa-chart-pie"></i> Dashboard</a>
+                </li>
+                <li>
+                    <a href="#"><i class="fa-solid fa-arrow-right-arrow-left"></i> Transactions</a>
+                </li>
+                <li>
+                    <a href="#"><i class="fa-solid fa-wallet"></i> Accounts</a>
+                </li>
+                <li>
+                    <a href="#"><i class="fa-solid fa-gear"></i> Settings</a>
+                </li>
+            </ul>
+        </div>
+        <div class="sidebar-footer">
+            <div class="avatar">JD</div>
+            <div class="user-info">
+                <div class="name">John Doe</div>
+                <div class="role">Administrator</div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Header -->
+        <header>
+            <h1>Dashboard Overview</h1>
+            <div class="header-actions">
+                <button class="notification-btn"><i class="fa-regular fa-bell"></i></button>
+            </div>
+        </header>
+
+        <!-- Dashboard Body -->
+        <div class="dashboard-body">
+            
+            <!-- Quick Stats -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <span class="title">Total Balance</span>
+                    <span class="value">$1,425,890.00</span>
+                    <span class="trend positive"><i class="fa-solid fa-arrow-trend-up"></i> +12.4% this month</span>
+                </div>
+                <div class="stat-card">
+                    <span class="title">Pending Outflow</span>
+                    <span class="value">$560,000.00</span>
+                    <span class="trend warning"><i class="fa-solid fa-clock"></i> 1 Transaction pending</span>
+                </div>
+                <div class="stat-card">
+                    <span class="title">Completed Volume (30D)</span>
+                    <span class="value">$3,890,200.00</span>
+                    <span class="trend positive"><i class="fa-solid fa-arrow-trend-up"></i> +5.2%</span>
+                </div>
+            </div>
+
+            <!-- Priority Pending Transaction Section -->
+            <div>
+                <h3 class="section-title">Priority Release Queue</h3>
+                <div class="transaction-card">
+                    <div class="tx-header">
+                        <span class="tx-id">TXN-ID: #9842-AXB-2026</span>
+                        <span class="badge-pending">
+                            <i class="fa-solid fa-clock-rotate-left"></i> Pending Release
+                        </span>
+                    </div>
+
+                    <div class="tx-details-grid">
+                        <div class="detail-item">
+                            <label>Transfer Amount</label>
+                            <div class="detail-value amount">$560,000.00</div>
+                        </div>
+                        <div class="detail-item">
+                            <label>Recipient / Destination</label>
+                            <div class="detail-value">Global Logistics Corp</div>
+                        </div>
+                        <div class="detail-item">
+                            <label>Payment Method</label>
+                            <div class="detail-value">Wire Transfer (SWIFT)</div>
+                        </div>
+                        <div class="detail-item">
+                            <label>Initiated By</label>
+                            <div class="detail-value">Treasury Department</div>
+                        </div>
+                    </div>
+
+                    <div class="tx-footer">
+                        <span><i class="fa-solid fa-triangle-exclamation" style="color: #f59e0b; margin-right: 6px;"></i> Automated escrow hold active.</span>
+                        <strong>Scheduled Release: Tomorrow (<span id="tomorrow-date"></span>)</strong>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- JavaScript to automatically calculate and show "Tomorrow's Date" -->
+    <script>
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        const options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
+        document.getElementById('tomorrow-date').innerText = tomorrow.toLocaleDateString('en-US', options);
+    </script>
+</body>
+</html>
